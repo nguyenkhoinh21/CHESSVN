@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -7,7 +6,9 @@
 <title>CHESSVN</title>
 
 <style>
-* { box-sizing: border-box; }
+* {
+    box-sizing: border-box;
+}
 
 body {
     margin: 0;
@@ -18,89 +19,302 @@ body {
 }
 
 h1 {
-    color: #81b64c;
-    margin: 20px 0 5px;
+    margin: 15px 0 5px;
+    letter-spacing: 3px;
 }
 
 #status {
     margin: 12px;
-    font-size: 17px;
+    font-size: 18px;
+    font-weight: bold;
 }
 
-.board {
-    width: min(94vw, 480px);
-    aspect-ratio: 1;
+#board {
+    width: min(94vw, 560px);
+    height: min(94vw, 560px);
     margin: 15px auto;
     display: grid;
+transition: transform 0.3s ease;
     grid-template-columns: repeat(8, 1fr);
     grid-template-rows: repeat(8, 1fr);
+    border: 4px solid #171614;
 }
-
 .square {
     position: relative;
     display: flex;
-    justify-content: center;
     align-items: center;
-    min-width: 0;
+    justify-content: center;
+    aspect-ratio: 1;
     cursor: pointer;
 }
+.coordinate {
+    position: absolute;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 1;
+    z-index: 3;
+    pointer-events: none;
+}
 
-.light { background: #eeeed2; }
-.dark { background: #769656; }
+.square.light .coordinate {
+    color: #769656;
+}
+
+.square.dark .coordinate {
+    color: #eeeed2;
+}
+
+.coordinate.rank {
+    top: 3px;
+    left: 4px;
+}
+
+.coordinate.file {
+    bottom: 3px;
+    right: 4px;
+}
+.light {
+    background: #eeeed2;
+}
+
+.dark {
+    background: #769656;
+}
 
 .square img {
-    width: 94%;
-    height: 94%;
+    width: 90%;
+    height: 90%;
     object-fit: contain;
+    z-index: 2;
     pointer-events: none;
 }
 
 .selected {
-    box-shadow: inset 0 0 0 4px #f5d442;
+    background: #f6f669 !important;
 }
 
 .target::after {
     content: "";
     position: absolute;
-    width: 25%;
-    height: 25%;
+    width: 28%;
+    height: 28%;
     border-radius: 50%;
-    background: #356b35;
-    opacity: .7;
+    background: rgba(30, 30, 30, 0.35);
+}
+
+.target.capture::after {
+    width: 85%;
+    height: 85%;
+    background: transparent;
+    border: 5px solid rgba(30, 30, 30, 0.35);
 }
 
 button {
-    padding: 11px 20px;
-    margin: 8px;
-    border: none;
-    border-radius: 7px;
     background: #81b64c;
     color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 6px;
+    font-size: 16px;
     font-weight: bold;
-    font-size: 15px;
+    cursor: pointer;
+    margin: 10px;
+}
+
+button:active {
+    background: #68943d;
+}
+.restart-btn {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+.auto-flip {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: white;
+    font-size: 14px;
+    margin: 15px 20px 12px;
+    z-index: 10;
+}
+.switch {
+    position: relative;
+    width: 48px;
+    height: 26px;
+}
+
+.switch input {
+    display: none;
+}
+
+.slider {
+    position: absolute;
+    inset: 0;
+    background: #777;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.slider::before {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    left: 3px;
+    top: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: 0.2s;
+}
+
+.switch input:checked + .slider {
+    background: #22c55e;
+}
+
+.switch input:checked + .slider::before {
+    transform: translateX(22px);
+}
+.game-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 12px 20px;
+}
+
+.auto-flip {
+    position: static;
+    margin: 0;
+}
+
+.restart-btn {
+    position: static;
+    width: 50px;
+    height: 50px;
+    border: none;
+    border-radius: 50%;
+    background: #80b64b;
+    color: white;
+    font-size: 30px;
+    cursor: pointer;
+}
+.promotion-menu {
+    display: none;
+}
+.promotion-menu {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+.promotion-box {
+    background: #302e2b;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    color: white;
+}
+
+.promotion-box h3 {
+    margin-top: 0;
+}
+
+#promotionChoices {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.promotion-choice {
+    width: 65px;
+    height: 65px;
+    background: #e9edcf;
+    border: 2px solid #777;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.promotion-choice img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 </style>
 </head>
 
 <body>
 
-<h1>♟ CHESSVN</h1>
-<div id="status">Lượt Trắng</div>
+<h1>CHESSVN</h1>
+    <div id="status">Lượt Trắng</div>
+<div class="game-controls">
+    <div class="auto-flip">
+        <span>Tự động lật bàn cờ</span>
+        <label class="switch">
+            <input type="checkbox" id="autoFlip">
+            <span class="slider"></span>
+        </label>
+    </div>
 
-<div class="board" id="board"></div>
-
-<button onclick="restart()">Chơi lại</button>
-
+    <button class="restart-btn" onclick="restart()" title="Chơi lại">
+        ↻
+    </button>
+</div>
+<div class="board-wrapper">
+    <div class="coordinates-left" id="numbers"></div>
+    <div id="board"></div>
+    <div class="coordinates-bottom" id="letters"></div>
+</div>
+<div id="promotionMenu" class="promotion-menu">
+    <div class="promotion-box">
+        <h3>Chọn quân phong cấp</h3>
+        <div id="promotionChoices"></div>
+    </div>
+</div>
 <script>
 const board = document.getElementById("board");
 const statusText = document.getElementById("status");
-
+autoFlip.addEventListener("change", function() {
+    render();
+});
 let pieces = [];
 let turn = "w";
 let selected = null;
-let enPassant = null;
-let lastMove = null;
 let legalTargets = [];
+
+let enPassant = null;
+
+let castlingRights = {
+    wK: true,
+    wQ: true,
+    bK: true,
+    bQ: true
+};
+
+const pieceSymbols = {
+    wk: "♔", wq: "♕", wr: "♖",
+    wb: "♗", wn: "♘", wp: "♙",
+    bk: "♚", bq: "♛", br: "♜",
+    bb: "♝", bn: "♞", bp: "♟"
+};
+
+function imageURL(piece) {
+    return "https://assets-themes.chess.com/image/ejgfv/150/" + piece + ".png";
+}
 
 function initialPosition() {
     pieces = [
@@ -116,73 +330,176 @@ function initialPosition() {
 
     turn = "w";
     selected = null;
-    enPassant = null;
-    lastMove = null;
     legalTargets = [];
+    enPassant = null;
+
+    castlingRights = {
+        wK: true,
+        wQ: true,
+        bK: true,
+        bQ: true
+    };
 
     render();
 }
 
-function imageURL(piece) {
-    return "https://assets-themes.chess.com/image/ejgfv/150/" + piece + ".png";
+function inside(r, c) {
+    return r >= 0 && r < 8 && c >= 0 && c < 8;
 }
 
-function pawnMoves(pos) {
+function findKing(color) {
+    return pieces.indexOf(color + "k");
+}
+
+// Kiểm tra một ô có bị đối phương tấn công không
+function isSquareAttacked(pos, byColor) {
     const row = Math.floor(pos / 8);
     const col = pos % 8;
-    const piece = pieces[pos];
 
-    if (!piece || piece[1] !== "p") return [];
+    // Tốt
+    const pawnSourceRow = row + (byColor === "w" ? 1 : -1);
 
-    const color = piece[0];
-    const direction = color === "w" ? -1 : 1;
-    const startRow = color === "w" ? 6 : 1;
+    for (const dc of [-1, 1]) {
+        const c = col + dc;
+
+        if (inside(pawnSourceRow, c)) {
+            const p = pieces[pawnSourceRow * 8 + c];
+
+            if (p === byColor + "p") return true;
+        }
+    }
+
+    // Mã
+    const knightSteps = [
+        [2,1],[2,-1],[-2,1],[-2,-1],
+        [1,2],[1,-2],[-1,2],[-1,-2]
+    ];
+
+    for (const [dr, dc] of knightSteps) {
+        const r = row + dr;
+        const c = col + dc;
+
+        if (inside(r, c) &&
+            pieces[r * 8 + c] === byColor + "n") {
+            return true;
+        }
+    }
+
+    // Vua
+    for (let dr = -1; dr <= 1; dr++) {
+        for (let dc = -1; dc <= 1; dc++) {
+            if (dr === 0 && dc === 0) continue;
+
+            const r = row + dr;
+            const c = col + dc;
+
+            if (inside(r, c) &&
+                pieces[r * 8 + c] === byColor + "k") {
+                return true;
+            }
+        }
+    }
+
+    // Xe, tượng, hậu
+    const directions = [
+        [1,0],[-1,0],[0,1],[0,-1],
+        [1,1],[1,-1],[-1,1],[-1,-1]
+    ];
+
+    for (let i = 0; i < directions.length; i++) {
+        const [dr, dc] = directions[i];
+
+        let r = row + dr;
+        let c = col + dc;
+        let distance = 1;
+
+        while (inside(r, c)) {
+            const p = pieces[r * 8 + c];
+
+            if (p !== "") {
+                if (p[0] === byColor) {
+                    const type = p[1];
+
+                    const straight = i < 4;
+                    const diagonal = i >= 4;
+
+                    if (type === "q") return true;
+                    if (straight && type === "r") return true;
+                    if (diagonal && type === "b") return true;
+
+                    if (distance === 1 && type === "k") {
+                        return true;
+                    }
+                }
+
+                break;
+            }
+
+            r += dr;
+            c += dc;
+            distance++;
+        }
+    }
+
+    return false;
+}
+
+function isInCheck(color) {
+    const king = findKing(color);
+
+    if (king === -1) return true;
+
+    const enemy = color === "w" ? "b" : "w";
+
+    return isSquareAttacked(king, enemy);
+}
+
+// Nước đi của tốt
+function pawnMoves(pos) {
     const moves = [];
 
-    const nextRow = row + direction;
+    const color = pieces[pos][0];
+    const row = Math.floor(pos / 8);
+    const col = pos % 8;
 
-    if (nextRow < 0 || nextRow > 7) return moves;
+    const direction = color === "w" ? -1 : 1;
+    const startRow = color === "w" ? 6 : 1;
 
-    const forward = nextRow * 8 + col;
+    const oneRow = row + direction;
 
-    // Đi thẳng 1 ô
-    if (pieces[forward] === "") {
-        moves.push(forward);
+    if (inside(oneRow, col) &&
+        pieces[oneRow * 8 + col] === "") {
 
-        // Đi 2 ô ở nước đầu tiên
-        if (row === startRow) {
-            const twoRow = row + direction * 2;
-            const twoStep = twoRow * 8 + col;
+        moves.push(oneRow * 8 + col);
 
-            if (pieces[twoStep] === "") {
-                moves.push(twoStep);
-            }
+        const twoRow = row + direction * 2;
+
+        if (row === startRow &&
+            pieces[twoRow * 8 + col] === "") {
+            moves.push(twoRow * 8 + col);
         }
     }
 
     // Ăn chéo
     for (const dc of [-1, 1]) {
-        const newCol = col + dc;
+        const r = row + direction;
+        const c = col + dc;
 
-        if (newCol < 0 || newCol > 7) continue;
+        if (!inside(r, c)) continue;
 
-        const target = nextRow * 8 + newCol;
+        const target = r * 8 + c;
+        const targetPiece = pieces[target];
 
-        if (
-            pieces[target] !== "" &&
-            pieces[target][0] !== color &&
-            pieces[target][1] !== "k"
-        ) {
+        if (targetPiece !== "" &&
+            targetPiece[0] !== color &&
+            targetPiece[1] !== "k") {
             moves.push(target);
         }
 
-        // Bắt tốt qua đường
-        if (
-            enPassant === target &&
-            pieces[target] === "" &&
-            pieces[target + 8 * (color === "w" ? 1 : -1)] ===
-                (color === "w" ? "bp" : "wp")
-        ) {
+        // Ăn tốt qua đường
+        if (enPassant &&
+            enPassant.target === target &&
+            enPassant.color !== color) {
             moves.push(target);
         }
     }
@@ -190,96 +507,55 @@ function pawnMoves(pos) {
     return moves;
 }
 
-function movePawn(from, to) {
-    const piece = pieces[from];
-    const color = piece[0];
-    const oldRow = Math.floor(from / 8);
-    const newRow = Math.floor(to / 8);
-    const oldCol = from % 8;
-    const newCol = to % 8;
-
-    // Bắt tốt qua đường
-    if (
-        oldCol !== newCol &&
-        pieces[to] === ""
-    ) {
-        const captured = to + (color === "w" ? 8 : -8);
-        pieces[captured] = "";
-    }
-
-    pieces[to] = piece;
-    pieces[from] = "";
-
-    // Xác định ô bắt tốt qua đường
-    enPassant = null;
-
-    if (Math.abs(newRow - oldRow) === 2) {
-        enPassant = (from + to) / 2;
-    }
-
-    lastMove = { from, to };
-
-    // Phong cấp
-    if (
-        (color === "w" && newRow === 0) ||
-        (color === "b" && newRow === 7)
-    ) {
-        let choice = prompt(
-            "Phong cấp: nhập q (Hậu), r (Xe), b (Tượng), n (Mã)",
-            "q"
-        );
-
-        choice = (choice || "q").toLowerCase();
-
-        if (!["q", "r", "b", "n"].includes(choice)) {
-            choice = "q";
-        }
-
-        pieces[to] = color + choice;
-    }
-    turn = color === "w" ? "b" : "w";
-    selected = null;
-    legalTargets = [];
-
-    render();
-}
+// Nước đi của các quân còn lại
 function pieceMoves(pos) {
     const piece = pieces[pos];
+
     if (!piece || piece[1] === "p") return [];
 
     const color = piece[0];
     const type = piece[1];
+
     const row = Math.floor(pos / 8);
     const col = pos % 8;
+
     const moves = [];
 
     const directions = {
         r: [[1,0],[-1,0],[0,1],[0,-1]],
         b: [[1,1],[1,-1],[-1,1],[-1,-1]],
-        q: [[1,0],[-1,0],[0,1],[0,-1],
-            [1,1],[1,-1],[-1,1],[-1,-1]],
-        k: [[1,0],[-1,0],[0,1],[0,-1],
-            [1,1],[1,-1],[-1,1],[-1,-1]],
-        n: [[2,1],[2,-1],[-2,1],[-2,-1],
-            [1,2],[1,-2],[-1,2],[-1,-2]]
+        q: [
+            [1,0],[-1,0],[0,1],[0,-1],
+            [1,1],[1,-1],[-1,1],[-1,-1]
+        ],
+        k: [
+            [1,0],[-1,0],[0,1],[0,-1],
+            [1,1],[1,-1],[-1,1],[-1,-1]
+        ],
+        n: [
+            [2,1],[2,-1],[-2,1],[-2,-1],
+            [1,2],[1,-2],[-1,2],[-1,-2]
+        ]
     };
 
-    const sliding = ["r", "b", "q"].includes(type);
+    const sliding = ["r","b","q"].includes(type);
 
     for (const [dr, dc] of directions[type]) {
         let r = row + dr;
         let c = col + dc;
 
-        while (r >= 0 && r < 8 && c >= 0 && c < 8) {
+        while (inside(r, c)) {
             const target = r * 8 + c;
+            const targetPiece = pieces[target];
 
-            if (pieces[target] === "") {
+            if (targetPiece === "") {
                 moves.push(target);
             } else {
-                if (pieces[target][0] !== color &&
-                    pieces[target][1] !== "k") {
+                if (targetPiece[0] !== color &&
+                    targetPiece[1] !== "k") {
                     moves.push(target);
                 }
+
                 break;
             }
 
@@ -290,37 +566,269 @@ function pieceMoves(pos) {
         }
     }
 
+    // Nhập thành
+    if (type === "k") {
+        const enemy = color === "w" ? "b" : "w";
+        const homeRow = color === "w" ? 7 : 0;
+        const rightK = color + "K";
+        const rightQ = color + "Q";
+
+        if (pos === homeRow * 8 + 4 &&
+            !isSquareAttacked(pos, enemy)) {
+
+            // Nhập thành cánh vua
+            if (castlingRights[rightK] &&
+                pieces[homeRow * 8 + 7] === color + "r" &&
+                pieces[homeRow * 8 + 5] === "" &&
+                pieces[homeRow * 8 + 6] === "" &&
+                !isSquareAttacked(homeRow * 8 + 5, enemy) &&
+                !isSquareAttacked(homeRow * 8 + 6, enemy)) {
+
+                moves.push(homeRow * 8 + 6);
+            }
+
+            // Nhập thành cánh hậu
+            if (castlingRights[rightQ] &&
+                pieces[homeRow * 8] === color + "r" &&
+                pieces[homeRow * 8 + 1] === "" &&
+                pieces[homeRow * 8 + 2] === "" &&
+                pieces[homeRow * 8 + 3] === "" &&
+                !isSquareAttacked(homeRow * 8 + 3, enemy) &&
+                !isSquareAttacked(homeRow * 8 + 2, enemy)) {
+
+                moves.push(homeRow * 8 + 2);
+            }
+        }
+    }
+
     return moves;
 }
 
-function clickSquare(i) {
+// Kiểm tra nước đi có làm vua mình bị chiếu không
+function legalMoves(pos) {
+    const color = pieces[pos][0];
+
+    const possible = pieces[pos][1] === "p"
+        ? pawnMoves(pos)
+        : pieceMoves(pos);
+
+    return possible.filter(target => {
+        const oldFrom = pieces[pos];
+        const oldTarget = pieces[target];
+
+        const oldEnPassant = enPassant;
+
+        let capturedPawn = null;
+        let capturedPawnPos = null;
+
+        // Mô phỏng ăn tốt qua đường
+        if (oldFrom[1] === "p" &&
+            enPassant &&
+            target === enPassant.target &&
+            oldTarget === "") {
+
+            capturedPawnPos = enPassant.pawnPos;
+            capturedPawn = pieces[capturedPawnPos];
+
+            pieces[capturedPawnPos] = "";
+        }
+
+        pieces[target] = oldFrom;
+        pieces[pos] = "";
+
+        // Mô phỏng xe khi nhập thành
+        let rookFrom = null;
+        let rookTo = null;
+        let rookPiece = null;
+
+        if (oldFrom[1] === "k" &&
+            Math.abs(target - pos) === 2) {
+
+            const row = Math.floor(pos / 8);
+
+            if (target > pos) {
+                rookFrom = row * 8 + 7;
+                rookTo = row * 8 + 5;
+            } else {
+                rookFrom = row * 8;
+                rookTo = row * 8 + 3;
+            }
+
+            rookPiece = pieces[rookFrom];
+
+            pieces[rookTo] = rookPiece;
+            pieces[rookFrom] = "";
+        }
+
+        const kingPos = findKing(color);
+        const enemy = color === "w" ? "b" : "w";
+
+        const safe = kingPos !== -1 &&
+            !isSquareAttacked(kingPos, enemy);
+
+        // Khôi phục bàn cờ
+        pieces[pos] = oldFrom;
+        pieces[target] = oldTarget;
+
+        if (capturedPawnPos !== null) {
+            pieces[capturedPawnPos] = capturedPawn;
+        }
+
+        if (rookFrom !== null) {
+            pieces[rookFrom] = rookPiece;
+            pieces[rookTo] = "";
+        }
+
+        enPassant = oldEnPassant;
+
+        return safe;
+    });
+}
+
+// Cập nhật quyền nhập thành
+function updateCastlingRights(from, to, movingPiece, capturedPiece) {
+    if (movingPiece === "wk") {
+        castlingRights.wK = false;
+        castlingRights.wQ = false;
+    }
+
+    if (movingPiece === "bk") {
+        castlingRights.bK = false;
+        castlingRights.bQ = false;
+    }
+
+    if (movingPiece === "wr") {
+        if (from === 63) castlingRights.wK = false;
+        if (from === 56) castlingRights.wQ = false;
+    }
+
+    if (movingPiece === "br") {
+        if (from === 7) castlingRights.bK = false;
+        if (from === 0) castlingRights.bQ = false;
+    }
+
+    // Xe bị ăn tại vị trí ban đầu
+    if (capturedPiece === "wr") {
+        if (to === 63) castlingRights.wK = false;
+        if (to === 56) castlingRights.wQ = false;
+    }
+
+    if (capturedPiece === "br") {
+        if (to === 7) castlingRights.bK = false;
+        if (to === 0) castlingRights.bQ = false;
+    }
+}
+
+// Thực hiện nước đi
+function makeMove(from, to) {
+    const movingPiece = pieces[from];
+    const capturedPiece = pieces[to];
+
+    const color = movingPiece[0];
+    const type = movingPiece[1];
+
+    const oldEnPassant = enPassant;
+
+    updateCastlingRights(from, to, movingPiece, capturedPiece);
+
+    // Ăn tốt qua đường
+    if (type === "p" &&
+        oldEnPassant &&
+        to === oldEnPassant.target &&
+        pieces[to] === "") {
+
+        pieces[oldEnPassant.pawnPos] = "";
+    }
+
+    // Di chuyển quân
+    pieces[to] = movingPiece;
+    pieces[from] = "";
+
+    // Nhập thành: di chuyển xe
+    if (type === "k" && Math.abs(to - from) === 2) {
+        const row = Math.floor(from / 8);
+
+        if (to > from) {
+            pieces[row * 8 + 5] = pieces[row * 8 + 7];
+            pieces[row * 8 + 7] = "";
+        } else {
+            pieces[row * 8 + 3] = pieces[row * 8];
+            pieces[row * 8] = "";
+        }
+    }
+
+    // Đặt lại quyền ăn tốt qua đường
+    enPassant = null;
+
+    if (type === "p" && Math.abs(to - from) === 16) {
+        enPassant = {
+            target: (from + to) / 2,
+            pawnPos: to,
+            color: color
+        };
+    }
+
+
+// Phong cấp
+const row = Math.floor(to / 8);
+
+if (type === "p" && (row === 0 || row === 7)) {
+    showPromotionMenu(color, to);
+    return;
+}
+
+finishTurn();
+}
+function finishTurn() {
+    turn = turn === "w" ? "b" : "w";
+    selected = null;
+    legalTargets = [];
+    render();
+}
+
+function showPromotionMenu(color, pos) {
+    const menu = document.getElementById("promotionMenu");
+    const choices = document.getElementById("promotionChoices");
+
+    choices.innerHTML = "";
+
+    ["q", "r", "b", "n"].forEach(type => {
+        const img = document.createElement("img");
+
+        img.src = imageURL(color + type);
+        img.className = "promotion-choice";
+
+        img.onclick = function() {
+            pieces[pos] = color + type;
+            menu.style.display = "none";
+            finishTurn();
+        };
+
+        choices.appendChild(img);
+    });
+
+    menu.style.display = "flex";
+}
+// Chọn quân và di chuyển
+function clickSquare(pos) {
     if (selected === null) {
-        if (pieces[i] !== "" && pieces[i][0] === turn) {
-            selected = i;
-            legalTargets = pieces[i][1] === "p"
-                ? pawnMoves(i)
-                : pieceMoves(i);
+        if (pieces[pos] !== "" &&
+            pieces[pos][0] === turn) {
+
+            selected = pos;
+            legalTargets = legalMoves(pos);
         }
     } else {
-        if (legalTargets.includes(i)) {
-            if (pieces[selected][1] === "p") {
-                movePawn(selected, i);
-            } else {
-                pieces[i] = pieces[selected];
-                pieces[selected] = "";
-                turn = turn === "w" ? "b" : "w";
-                selected = null;
-                legalTargets = [];
-                render();
-            }
+        if (legalTargets.includes(pos)) {
+            makeMove(selected, pos);
             return;
         }
 
-        if (pieces[i] !== "" && pieces[i][0] === turn) {
-            selected = i;
-            legalTargets = pieces[i][1] === "p"
-                ? pawnMoves(i)
-                : pieceMoves(i);
+        if (pieces[pos] !== "" &&
+            pieces[pos][0] === turn) {
+
+            selected = pos;
+            legalTargets = legalMoves(pos);
         } else {
             selected = null;
             legalTargets = [];
@@ -329,20 +837,18 @@ function clickSquare(i) {
 
     render();
 }
+
+// Hiển thị bàn cờ
+
 function render() {
     board.innerHTML = "";
+for (let i = 0; i < 64; i++) {
+    const square = document.createElement("div");
 
-    for (let i = 0; i < 64; i++) {
-        const square = document.createElement("div");
-
-        square.className = "square";
-
-        const row = Math.floor(i / 8);
-        const col = i % 8;
-
-        square.classList.add(
-            (row + col) % 2 === 0 ? "light" : "dark"
-        );
+    const row = Math.floor(i / 8);
+    const col = i % 8;
+        square.className =
+            "square " + ((row + col) % 2 === 0 ? "light" : "dark");
 
         if (selected === i) {
             square.classList.add("selected");
@@ -350,29 +856,75 @@ function render() {
 
         if (legalTargets.includes(i)) {
             square.classList.add("target");
+
+            if (pieces[i] !== "") {
+                square.classList.add("capture");
+            }
         }
 
         if (pieces[i] !== "") {
             const img = document.createElement("img");
             img.src = imageURL(pieces[i]);
             img.alt = pieces[i];
-
+if (autoFlip.checked && turn === "b") {
+    img.style.transform = "rotate(180deg)";
+}
             img.onerror = function() {
-                this.style.display = "none";
-                square.textContent = pieces[i];
+                const fallback = document.createElement("span");
+                fallback.textContent = pieceSymbols[pieces[i]];
+                fallback.style.fontSize = "min(10vw, 48px)";
+                square.replaceChild(fallback, img);
             };
 
             square.appendChild(img);
         }
 
-        square.addEventListener("click", () => clickSquare(i));
+        // Tọa độ hàng: 8 đến 1
+if (col === 0) {
+            const rank = document.createElement("span");
+            rank.className = "coordinate rank";
+            rank.textContent = 8 - row;
+            square.appendChild(rank);
+        }
 
+        // Tọa độ cột: a đến h
+if (row === 7) {
+            const file = document.createElement("span");
+            file.className = "coordinate file";
+            file.textContent = "abcdefgh"[col];
+            square.appendChild(file);
+        }
+
+        square.addEventListener("click", () => clickSquare(i));
         board.appendChild(square);
     }
 
-    statusText.textContent =
-        turn === "w" ? "Lượt Trắng" : "Lượt Đen";
+    const currentCheck = isInCheck(turn);
+
+    statusText.textContent = currentCheck
+        ? (turn === "w" ? "Trắng" : "Đen") + " đang bị chiếu!"
+        : "Lượt " + (turn === "w" ? "Trắng" : "Đen");
+
+    let hasMove = false;
+
+    for (let i = 0; i < 64; i++) {
+        if (pieces[i] !== "" && pieces[i][0] === turn) {
+            if (legalMoves(i).length > 0) {
+                hasMove = true;
+                break;
+            }
+        }
+    }
+
+    if (!hasMove) {
+        statusText.textContent = currentCheck
+            ? "CHIẾU HẾT! " +
+              (turn === "w" ? "Đen" : "Trắng") +
+              " chiến thắng!"
+            : "HÒA CỜ!";
+    }
 }
+
 
 function restart() {
     initialPosition();
